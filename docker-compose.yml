@@ -1,0 +1,10 @@
+version: "3.7"
+
+services:
+  rabbitmq:
+    image: rabbitmq:alpine
+    ports:
+      - "${PORT:-5672}:${PORT:-5672}"
+    environment:
+      - RABBITMQ_DEFAULT_USER=${USER:-docker}
+      - RABBITMQ_DEFAULT_PASS=${PASSWORD:-docker}
