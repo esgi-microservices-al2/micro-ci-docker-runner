@@ -64,7 +64,7 @@ func CreateContainer(imageName string, containerName string, commands []string) 
 	resp, err := cli.ContainerCreate(ctx, &container.Config{
 		Image: imageName,
 		Cmd:   commands,
-	}, nil, nil, containerName)
+	}, nil, nil, nil, containerName)
 	FailOnError(err, "Failed creating the container")
 
 	if err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
