@@ -5,11 +5,11 @@ services:
     image: esgimicroci/al2-docker-runner
     container_name: al2-docker-runner
     environment:
-      HOST: ${HOST}
-      USER: ${USER}
-      PASSWORD: ${PASSWORD}
-      PORT: ${PORT}
-      QUEUE: ${QUEUE}
+      RABBIT_HOST: ${RABBIT_HOST}
+      RABBIT_USER: ${RABBIT_USER}
+      RABBIT_PASSWORD: ${RABBIT_PASSWORD}
+      RABBIT_PORT: ${RABBIT_PORT}
+      RABBIT_RUNNER_QUEUE: ${RABBIT_RUNNER_QUEUE}
     restart: always
 
 # Add your networks/volumes/services for your microservice
