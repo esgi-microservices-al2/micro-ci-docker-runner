@@ -8,11 +8,11 @@ import (
 )
 
 func main() {
-	host := Getenv("HOST", "localhost")
-	user := Getenv("USER", "docker")
-	password := Getenv("PASSWORD", "docker")
-	port := Getenv("PORT", "5672")
-	queueName := Getenv("QUEUE", "commands")
+	host := Getenv("RABBIT_HOST", "localhost")
+	user := Getenv("RABBIT_USER", "docker")
+	password := Getenv("RABBIT_PASSWORD", "docker")
+	port := Getenv("RABBIT_PORT", "5672")
+	queueName := Getenv("RABBIT_RUNNER_QUEUE", "commands")
 
 	connectionString := fmt.Sprintf("amqp://%s:%s@%s:%s/", user, password, host, port)
 
