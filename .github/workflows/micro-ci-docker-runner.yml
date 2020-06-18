@@ -50,4 +50,5 @@ jobs:
           export RABBIT_RUNNER_QUEUE='${{ secrets.RABBIT_RUNNER_QUEUE }}' && \
           docker-compose stop && \
           docker-compose rm && \
+          docker-compose pull && \
           docker-compose up -d"
