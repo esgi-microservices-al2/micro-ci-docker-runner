@@ -16,7 +16,7 @@ func main() {
 	port := Getenv("RABBIT_PORT", "5672")
 	queueName := Getenv("RABBIT_RUNNER_QUEUE", "commands")
 
-	connectionString := url.QueryEscape(fmt.Sprintf("amqp://%s:%s@%s:%s/", user, password, host, port))
+	connectionString := fmt.Sprintf("amqp://%s:%s@%s:%s/", user, url.QueryEscape(password), host, port)
 
 	conn, err := amqp.Dial(connectionString)
 	FailOnError(err, "Failed to connect to RabbitMQ")
