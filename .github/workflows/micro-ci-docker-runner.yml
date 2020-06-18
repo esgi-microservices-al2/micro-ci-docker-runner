@@ -43,11 +43,11 @@ jobs:
           az vm run-command invoke -g ${{ secrets.AZURE_RESOURCE_GRP }} -n ${{ secrets.AZURE_VM }} --command-id RunShellScript --scripts \
           "cd /home/micro-ci-al2/micro-ci-docker-runner && \
           wget -q https://raw.githubusercontent.com/esgi-microservices-al2/micro-ci-docker-runner/master/.github/azure/docker-compose.yml -O docker-compose.yml && \
-          export RABBIT_HOST=${{RABBIT_HOST}} && \
-          export RABBIT_USER=${{RABBIT_USER}} && \
-          export RABBIT_PASSWORD=${{RABBIT_PASSWORD}} && \
-          export RABBIT_PORT=${{RABBIT_PORT}} && \
-          export RABBIT_RUNNER_QUEUE=${{RABBIT_RUNNER_QUEUE}} && \
+          export RABBIT_HOST=${{ secrets.RABBIT_HOST }} && \
+          export RABBIT_USER=${{ secrets.RABBIT_USER }} && \
+          export RABBIT_PASSWORD=${{ secrets.RABBIT_PASSWORD }} && \
+          export RABBIT_PORT=${{ secrets.RABBIT_PORT }} && \
+          export RABBIT_RUNNER_QUEUE=${{ secrets.RABBIT_RUNNER_QUEUE }} && \
           docker-compose stop && \
           docker-compose rm && \
           docker-compose up -d"
