@@ -11,5 +11,11 @@ services:
       RABBIT_PORT: ${RABBIT_PORT}
       RABBIT_RUNNER_QUEUE: ${RABBIT_RUNNER_QUEUE}
     restart: always
+    privileged: true
+    volumes:
+      - al2projects:/var/projects
 
+volumes:
+  al2projects:
+    external: true
 # Add your networks/volumes/services for your microservice

@@ -8,3 +8,23 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=${USER:-docker}
       - RABBITMQ_DEFAULT_PASS=${PASSWORD:-docker}
+  micro-ci-docker-runner:
+    build:
+      dockerfile: ./Dockerfile
+      context: ./
+    environment:
+      RABBIT_HOST: ${RABBIT_HOST:-rabbitmq}
+      RABBIT_USER: ${RABBIT_USER:-docker}
+      RABBIT_PASSWORD: ${RABBIT_PASSWORD:-docker}
+      RABBIT_PORT: ${RABBIT_PORT:-5672}
+      RABBIT_RUNNER_QUEUE: ${RABBIT_RUNNER_QUEUE:-docker}
+    restart: always
+    privileged: true
+    volumes:
+      - al2projects:/var/projects
+    depends_on:
+      - rabbitmq
+
+volumes:
+  al2projects:
+    external: true
