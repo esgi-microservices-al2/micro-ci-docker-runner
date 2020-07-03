@@ -8,7 +8,7 @@ RUN go install -v ./...
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o app .
 
 FROM docker:dind as deploy
-RUN apk add --no-cache bash
+RUN mkdir /var/tar
 WORKDIR /app
 COPY --from=build /go/src/app/app .
 CMD ["./app"]

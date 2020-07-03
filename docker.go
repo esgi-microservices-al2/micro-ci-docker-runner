@@ -15,12 +15,12 @@ import (
 
 // BuildImage ... Builds an image from a tar context.
 // Path needs to point to a tar. dockerfile is the path to the Dockerfile in the archive.
-func BuildImage(path string, dockerfile string) {
+func BuildImage(path string, dockerfile string, logs *os.File) {
 	ctx := context.Background()
 
-	buildContext, err := os.Open(path)
+	archive, err := os.Open(path)
 	FailOnError(err, "Failed opening build context")
-	defer buildContext.Close()
+	defer archive.Close()
 
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	FailOnError(err, "Failed to connect to docker daemon")
@@ -33,10 +33,11 @@ func BuildImage(path string, dockerfile string) {
 		Dockerfile:     dockerfile,
 	}
 
-	out, err := cli.ImageBuild(ctx, buildContext, options)
+	out, err := cli.ImageBuild(ctx, archive, options)
+	defer out.Body.Close()
 	FailOnError(err, "Failed building the image")
 
-	io.Copy(os.Stdout, out.Body)
+	io.Copy(logs, out.Body)
 }
 
 // PullImage ... Simple image pull from docker

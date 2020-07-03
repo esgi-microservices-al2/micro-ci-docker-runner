@@ -2,9 +2,10 @@ version: "3.7"
 
 services:
   rabbitmq:
-    image: rabbitmq:alpine
+    image: rabbitmq:management-alpine
     ports:
       - "${PORT:-5672}:${PORT:-5672}"
+      - 15672:15672
     environment:
       - RABBITMQ_DEFAULT_USER=${USER:-docker}
       - RABBITMQ_DEFAULT_PASS=${PASSWORD:-docker}
@@ -18,6 +19,8 @@ services:
       RABBIT_PASSWORD: ${RABBIT_PASSWORD:-docker}
       RABBIT_PORT: ${RABBIT_PORT:-5672}
       RABBIT_RUNNER_QUEUE: ${RABBIT_RUNNER_QUEUE:-docker}
+      FOLDER_TAR: ${FOLDER_TAR:-.}
+      FOLDER_PROJECTS: ${FOLDER_PROJECTS:-.}
     restart: always
     privileged: true
     volumes:

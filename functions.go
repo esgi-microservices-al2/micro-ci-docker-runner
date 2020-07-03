@@ -27,6 +27,7 @@ func FailOnError(err error, msg string) {
 
 // CreateTar ... Creates a tar from a directory
 func CreateTar(src string, dest string) error {
+	log.Printf("Creating tar...")
 	var buffer bytes.Buffer
 	compress(src, &buffer)
 
@@ -39,13 +40,14 @@ func CreateTar(src string, dest string) error {
 		return err
 	}
 
+	log.Printf("Done !")
 	return nil
 }
 
 // Compress ... Compresses a directory into a tar writter buffer
 func compress(src string, buf io.Writer) error {
 	tw := tar.NewWriter(buf)
-
+	// os.Chdir(src)
 	filepath.Walk(src, func(file string, fi os.FileInfo, err error) error {
 		header, err := tar.FileInfoHeader(fi, file)
 		if err != nil {

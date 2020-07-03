@@ -10,6 +10,8 @@ services:
       RABBIT_PASSWORD: ${RABBIT_PASSWORD}
       RABBIT_PORT: ${RABBIT_PORT}
       RABBIT_RUNNER_QUEUE: ${RABBIT_RUNNER_QUEUE}
+      FOLDER_TAR: ${FOLDER_TAR:-/var/tar}
+      FOLDER_PROJECTS: ${FOLDER_PROJECTS:-/var/projects}
     restart: always
     privileged: true
     volumes:
