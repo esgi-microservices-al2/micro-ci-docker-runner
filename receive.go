@@ -1,13 +1,58 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 
 	"net/url"
 
+	"github.com/google/uuid"
 	"github.com/streadway/amqp"
 )
+
+var folderProjects string = Getenv("FOLDER_PROJECTS", ".")
+var folderTar string = Getenv("FOLDER_TAR", ".")
+
+type commandMessage struct {
+	Folder   string   `json:"folder"`
+	Commands []string `json:"commands"`
+}
+
+func handleMessage(message commandMessage) {
+	randomID, err := uuid.NewRandom()
+	if err != nil {
+		log.Printf(err.Error())
+		return
+	}
+
+	var destPath = fmt.Sprintf("%s/%s", folderTar, randomID)
+	var projectPath = fmt.Sprintf("%s/%s", folderProjects, message.Folder)
+	var archivePath = destPath + "/archive.tar"
+	var context = fmt.Sprintf("%s/Dockerfile", message.Folder)
+
+	err = os.Mkdir(destPath, 644)
+	if err != nil {
+		log.Printf(err.Error())
+		return
+	}
+
+	file, err := os.Create(destPath + "/logs")
+	if err != nil {
+		log.Printf(err.Error())
+
+		return
+	}
+
+	err = CreateTar(projectPath, archivePath)
+	if err != nil {
+		log.Printf(err.Error())
+		return
+	}
+
+	BuildImage(archivePath, context, file)
+}
 
 func main() {
 	host := Getenv("RABBIT_HOST", "localhost")
@@ -39,7 +84,7 @@ func main() {
 	msgs, err := channel.Consume(
 		q.Name, // queue
 		"",     // consumer
-		true,   // auto-ack
+		false,  // auto-ack
 		false,  // exclusive
 		false,  // no-local
 		false,  // no-wait
@@ -50,8 +95,12 @@ func main() {
 
 	go func() {
 		for d := range msgs {
-			log.Printf("Received a message : %s", d.Body)
-			// Call docker commands here
+			var msg commandMessage
+			json.Unmarshal([]byte(d.Body), &msg)
+
+			handleMessage(msg)
+
+			d.Ack(false)
 		}
 	}()
 
