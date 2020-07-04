@@ -1,8 +1,10 @@
 package main
 
 type CommandMessage struct {
-	Folder   string     `json:"folder"`
-	Commands [][]string `json:"commands"`
+	BuildID   string     `json:"buildId"`
+	ProjectID string     `json:"projectId"`
+	Folder    string     `json:"folder"`
+	Commands  [][]string `json:"commands"`
 }
 
 type DockerId struct {
