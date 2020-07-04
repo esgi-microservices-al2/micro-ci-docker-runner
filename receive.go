@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 
@@ -15,6 +16,9 @@ func main() {
 	password := Getenv("RABBIT_PASSWORD", "docker")
 	port := Getenv("RABBIT_PORT", "5672")
 	queueName := Getenv("RABBIT_RUNNER_QUEUE", "commands")
+	eventQueueName := Getenv("RABBIT_EVENT_QUEUE", "events")
+	folderTar := Getenv("FOLDER_TAR", ".")
+	folderProjects := Getenv("FOLDER_PROJECTS", ".")
 
 	connectionString := fmt.Sprintf("amqp://%s:%s@%s:%s/", user, url.QueryEscape(password), host, port)
 
@@ -26,9 +30,13 @@ func main() {
 	FailOnError(err, "Failed to open a channel")
 	defer channel.Close()
 
+	eventChannel, err := conn.Channel()
+	FailOnError(err, "Failed to open a second channel")
+	defer eventChannel.Close()
+
 	q, err := channel.QueueDeclare(
 		queueName, // name
-		false,     // durable
+		true,      // durable
 		false,     // delete when unused
 		false,     // exclusive
 		false,     // no-wait
@@ -39,7 +47,7 @@ func main() {
 	msgs, err := channel.Consume(
 		q.Name, // queue
 		"",     // consumer
-		true,   // auto-ack
+		false,  // auto-ack
 		false,  // exclusive
 		false,  // no-local
 		false,  // no-wait
@@ -50,8 +58,11 @@ func main() {
 
 	go func() {
 		for d := range msgs {
-			log.Printf("Received a message : %s", d.Body)
-			// Call docker commands here
+			var msg CommandMessage
+			json.Unmarshal([]byte(d.Body), &msg)
+
+			d.Ack(false)
+			HandleMessage(msg, folderTar, folderProjects, eventChannel, eventQueueName)
 		}
 	}()
 
