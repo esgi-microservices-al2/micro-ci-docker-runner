@@ -74,10 +74,7 @@ func compress(src string, buf io.Writer) error {
 			return nil
 		}
 
-		i := strings.Index(header.Name, "/")
-		if i != -1 {
-			header.Name = header.Name[i+1:]
-		}
+		header.Name = header.Name[len(sourcePath)-1:]
 
 		if err := tw.WriteHeader(header); err != nil {
 			return err

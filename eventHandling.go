@@ -19,7 +19,7 @@ func HandleMessage(message CommandMessage, folderTar string, folderProjects stri
 	var archivePath = destPath + "/archive.tar"
 	var context = "Dockerfile"
 
-	// defer deleteWorkspaceHandler(destPath)
+	defer deleteWorkspaceHandler(destPath)
 
 	err := os.Mkdir(destPath, 644)
 	if err != nil {
