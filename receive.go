@@ -4,55 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"os"
 
 	"net/url"
 
-	"github.com/google/uuid"
 	"github.com/streadway/amqp"
 )
-
-var folderProjects string = Getenv("FOLDER_PROJECTS", ".")
-var folderTar string = Getenv("FOLDER_TAR", ".")
-
-type commandMessage struct {
-	Folder   string   `json:"folder"`
-	Commands []string `json:"commands"`
-}
-
-func handleMessage(message commandMessage) {
-	randomID, err := uuid.NewRandom()
-	if err != nil {
-		log.Printf(err.Error())
-		return
-	}
-
-	var destPath = fmt.Sprintf("%s/%s", folderTar, randomID)
-	var projectPath = fmt.Sprintf("%s/%s", folderProjects, message.Folder)
-	var archivePath = destPath + "/archive.tar"
-	var context = fmt.Sprintf("%s/Dockerfile", message.Folder)
-
-	err = os.Mkdir(destPath, 644)
-	if err != nil {
-		log.Printf(err.Error())
-		return
-	}
-
-	file, err := os.Create(destPath + "/logs")
-	if err != nil {
-		log.Printf(err.Error())
-
-		return
-	}
-
-	err = CreateTar(projectPath, archivePath)
-	if err != nil {
-		log.Printf(err.Error())
-		return
-	}
-
-	BuildImage(archivePath, context, file)
-}
 
 func main() {
 	host := Getenv("RABBIT_HOST", "localhost")
@@ -60,6 +16,8 @@ func main() {
 	password := Getenv("RABBIT_PASSWORD", "docker")
 	port := Getenv("RABBIT_PORT", "5672")
 	queueName := Getenv("RABBIT_RUNNER_QUEUE", "commands")
+	folderTar := Getenv("FOLDER_TAR", ".")
+	folderProjects := Getenv("FOLDER_PROJECTS", ".")
 
 	connectionString := fmt.Sprintf("amqp://%s:%s@%s:%s/", user, url.QueryEscape(password), host, port)
 
@@ -95,12 +53,11 @@ func main() {
 
 	go func() {
 		for d := range msgs {
-			var msg commandMessage
+			var msg CommandMessage
 			json.Unmarshal([]byte(d.Body), &msg)
 
-			handleMessage(msg)
-
 			d.Ack(false)
+			HandleMessage(msg, folderTar, folderProjects)
 		}
 	}()
 
