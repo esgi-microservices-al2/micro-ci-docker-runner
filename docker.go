@@ -15,7 +15,7 @@ import (
 	"github.com/docker/docker/client"
 )
 
-// BuildImage ... Builds an image from a tar context.
+// BuildImage  Builds an image from a tar context.
 // Path needs to point to a tar. dockerfile is the path to the Dockerfile in the archive.
 func BuildImage(path string, dockerfile string) (string, string, error) {
 	ctx := context.Background()
@@ -73,7 +73,7 @@ func BuildImage(path string, dockerfile string) (string, string, error) {
 	return imgID, output, errResult
 }
 
-// PullImage ... Simple image pull from docker
+// PullImage Simple image pull from docker
 func PullImage(imageName string) {
 	ctx := context.Background()
 
@@ -88,7 +88,7 @@ func PullImage(imageName string) {
 	io.Copy(os.Stdout, out)
 }
 
-// CreateContainer ... Creates a container with the given image and name
+// CreateContainer Creates a container with the given image and name
 func CreateContainer(imageName string, containerName string) (string, error) {
 	ctx := context.Background()
 
@@ -115,7 +115,7 @@ func CreateContainer(imageName string, containerName string) (string, error) {
 	return resp.ID, nil
 }
 
-// ExecCommand ... Executes a command inside of a running container
+// ExecCommand Executes a command inside of a running container
 func ExecCommand(command []string, container string) (int, string, error) {
 	ctx := context.Background()
 	var stdout string = ""
@@ -157,7 +157,7 @@ func ExecCommand(command []string, container string) (int, string, error) {
 	return inspection.ExitCode, stdout, nil
 }
 
-// DeleteContainer ... Stops and removes a running container from host
+// DeleteContainer Stops and removes a running container from host
 func DeleteContainer(container string) error {
 	ctx := context.Background()
 
@@ -171,7 +171,7 @@ func DeleteContainer(container string) error {
 	return err
 }
 
-// DeleteImage ... Removes an image after the build
+// DeleteImage Removes an image after the build
 func DeleteImage(imageID string) error {
 	ctx := context.Background()
 

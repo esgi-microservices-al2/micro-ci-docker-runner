@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	consul "github.com/hashicorp/consul/api"
 	"log"
 	"time"
+
+	consul "github.com/hashicorp/consul/api"
 )
 
 type Service struct {
