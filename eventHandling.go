@@ -39,6 +39,8 @@ func HandleMessage(message CommandMessage, folderTar string, folderProjects stri
 		return
 	}
 
+	defer deleteImageHandler(imageID)
+
 	containerID, err := createContainerHandler(imageID, ID, message.ProjectID, message.BuildID, eventChannel, eventQueue)
 	defer deleteContainerHandler(containerID)
 
@@ -177,6 +179,13 @@ func successfullBuild(projectID string, buildID string, ch *amqp.Channel, q stri
 
 func deleteWorkspaceHandler(path string) {
 	err := os.RemoveAll(path)
+	if err != nil {
+		log.Println(err.Error())
+	}
+}
+
+func deleteImageHandler(imageID string) {
+	err := DeleteImage(imageID)
 	if err != nil {
 		log.Println(err.Error())
 	}

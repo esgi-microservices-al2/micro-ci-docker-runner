@@ -170,3 +170,22 @@ func DeleteContainer(container string) error {
 	err = cli.ContainerRemove(ctx, container, types.ContainerRemoveOptions{Force: true})
 	return err
 }
+
+// DeleteImage ... Removes an image after the build
+func DeleteImage(imageID string) error {
+	ctx := context.Background()
+
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		log.Println(err.Error())
+		return errors.New("Internal error")
+	}
+
+	_, err = cli.ImageRemove(ctx, imageID, types.ImageRemoveOptions{Force: true})
+	if err != nil {
+		log.Println(err.Error())
+		return errors.New("Internal error")
+	}
+
+	return nil
+}
