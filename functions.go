@@ -59,7 +59,7 @@ func CreateTar(src string, dest string) error {
 func compress(src string, buf io.Writer) error {
 	tw := tar.NewWriter(buf)
 	sourcePath := filepath.ToSlash(src)
-	log.Println(sourcePath)
+
 	defer tw.Close()
 
 	filepath.Walk(src, func(file string, fi os.FileInfo, err error) error {
@@ -74,7 +74,7 @@ func compress(src string, buf io.Writer) error {
 			return nil
 		}
 
-		header.Name = header.Name[len(sourcePath)-1:]
+		header.Name = header.Name[len(sourcePath)+1:]
 
 		if err := tw.WriteHeader(header); err != nil {
 			return err
