@@ -1,1 +1,4 @@
 *.exe
+.idea/
+go/
+projet-test/

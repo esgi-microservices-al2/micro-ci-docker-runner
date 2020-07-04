@@ -51,6 +51,8 @@ jobs:
           export RABBIT_EVENT_QUEUE='${{ secrets.RABBIT_EVENT_QUEUE }}' && \
           export FOLDER_PROJECTS='${{ secrets.FOLDER_PROJECTS }}' && \
           export FOLDER_TAR='${{ secrets.FOLDER_TAR }}' && \
+          export CONSUL_URI='${{ secrets.CONSUL_URI }}' && \
+          export CONSUL_TOKEN='${{ secrets.CONSUL_TOKEN }}' && \
           docker-compose stop && \
           docker-compose rm && \
           docker-compose pull && \
