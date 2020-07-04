@@ -21,6 +21,7 @@ services:
       RABBIT_RUNNER_QUEUE: ${RABBIT_RUNNER_QUEUE:-docker}
       FOLDER_TAR: ${FOLDER_TAR:-.}
       FOLDER_PROJECTS: ${FOLDER_PROJECTS:-.}
+      RABBIT_EVENT_QUEUE: ${RABBIT_EVENT_QUEUE:-events}
     restart: always
     privileged: true
     volumes:
