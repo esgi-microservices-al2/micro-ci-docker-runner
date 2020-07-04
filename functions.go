@@ -59,7 +59,7 @@ func CreateTar(src string, dest string) error {
 func compress(src string, buf io.Writer) error {
 	tw := tar.NewWriter(buf)
 	sourcePath := filepath.ToSlash(src)
-
+	log.Println(sourcePath)
 	defer tw.Close()
 
 	filepath.Walk(src, func(file string, fi os.FileInfo, err error) error {
