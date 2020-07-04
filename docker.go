@@ -93,7 +93,7 @@ func CreateContainer(imageName string, containerName string) (string, error) {
 	resp, err := cli.ContainerCreate(ctx, &container.Config{
 		Image: imageName,
 		Cmd:   []string{"tail", "-f", "/dev/null"}, // Command to keep the container running in order to send user desired commands
-	}, nil, nil, containerName)
+	}, nil, nil, nil, containerName)
 	if err != nil {
 		log.Println(err.Error())
 		return "", errors.New("Internal error")
