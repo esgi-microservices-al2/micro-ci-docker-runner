@@ -4,6 +4,7 @@ import (
 	"archive/tar"
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io"
 	"log"
 	"os"
@@ -32,6 +33,10 @@ func FailOnError(err error, msg string) {
 // CreateTar ... Creates a tar from a directory
 func CreateTar(src string, dest string) error {
 	log.Printf("Creating tar...")
+	if _, err := os.Stat(src); os.IsNotExist(err) {
+		return errors.New("Project directory does not exsit :(")
+	}
+
 	var buffer bytes.Buffer
 	compress(src, &buffer)
 

@@ -15,8 +15,6 @@ import (
 	"github.com/docker/docker/client"
 )
 
-// TODO: Improve error handling. the program shouldn't crash if a docker task fails. We shoud notify the user.
-
 // BuildImage ... Builds an image from a tar context.
 // Path needs to point to a tar. dockerfile is the path to the Dockerfile in the archive.
 func BuildImage(path string, dockerfile string) (string, string, error) {

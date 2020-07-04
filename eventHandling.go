@@ -27,7 +27,7 @@ func HandleMessage(message CommandMessage, folderTar string, folderProjects stri
 		return
 	}
 
-	err = CreateTar(projectPath, archivePath)
+	err = tarCreationHandler(projectPath, archivePath, message.ProjectID, message.BuildID, eventChannel, eventQueue)
 	if err != nil {
 		log.Println(err.Error())
 		return
@@ -140,6 +140,26 @@ func buildImageHandler(archivePath string, context string, projectID string, bui
 
 	SendEventMessage(message, ch, q)
 	return imageID, nil
+}
+
+func tarCreationHandler(projectPath string, archivePath string, projectID string, buildID string, ch *amqp.Channel, q string) error {
+	var message EventMessage = EventMessage{
+		Subject:   "Build",
+		BuildID:   buildID,
+		ProjectID: projectID,
+	}
+
+	err := CreateTar(projectPath, archivePath)
+	if err != nil {
+		message.Content = err.Error()
+		message.Date = (time.Now()).Unix()
+		message.Type = "error"
+
+		SendEventMessage(message, ch, q)
+		return err
+	}
+
+	return nil
 }
 
 func successfullBuild(projectID string, buildID string, ch *amqp.Channel, q string) {
