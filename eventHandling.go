@@ -19,7 +19,7 @@ func HandleMessage(message CommandMessage, folderTar string, folderProjects stri
 	var archivePath = destPath + "/archive.tar"
 	var context = "Dockerfile"
 
-	// defer deleteWorkspaceHandler(destPath)
+	defer deleteWorkspaceHandler(destPath)
 
 	err := os.Mkdir(destPath, 644)
 	if err != nil {
@@ -38,6 +38,8 @@ func HandleMessage(message CommandMessage, folderTar string, folderProjects stri
 		log.Println(err.Error())
 		return
 	}
+
+	defer deleteImageHandler(imageID)
 
 	containerID, err := createContainerHandler(imageID, ID, message.ProjectID, message.BuildID, eventChannel, eventQueue)
 	defer deleteContainerHandler(containerID)
@@ -177,6 +179,13 @@ func successfullBuild(projectID string, buildID string, ch *amqp.Channel, q stri
 
 func deleteWorkspaceHandler(path string) {
 	err := os.RemoveAll(path)
+	if err != nil {
+		log.Println(err.Error())
+	}
+}
+
+func deleteImageHandler(imageID string) {
+	err := DeleteImage(imageID)
 	if err != nil {
 		log.Println(err.Error())
 	}
