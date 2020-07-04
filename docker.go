@@ -46,12 +46,12 @@ func BuildImage(path string, dockerfile string) (string, string, error) {
 	}
 
 	out, err := cli.ImageBuild(ctx, archive, options)
-	defer out.Body.Close()
-
 	if err != nil {
 		log.Println(err.Error())
 		return "", "", errors.New("Internal error")
 	}
+
+	defer out.Body.Close()
 
 	sc := bufio.NewScanner(out.Body)
 	for sc.Scan() {
