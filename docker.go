@@ -26,11 +26,18 @@ func BuildImage(path string, dockerfile string) (string, string, error) {
 	var imgID string
 
 	archive, err := os.Open(path)
-	FailOnError(err, "Failed opening build context")
+	if err != nil {
+		log.Println(err.Error())
+		return "", "", errors.New("Internal error")
+	}
+
 	defer archive.Close()
 
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-	FailOnError(err, "Failed to connect to docker daemon")
+	if err != nil {
+		log.Println(err.Error())
+		return "", "", errors.New("Internal error")
+	}
 
 	options := types.ImageBuildOptions{
 		SuppressOutput: false,
@@ -43,7 +50,10 @@ func BuildImage(path string, dockerfile string) (string, string, error) {
 	out, err := cli.ImageBuild(ctx, archive, options)
 	defer out.Body.Close()
 
-	FailOnError(err, "Failed building the image")
+	if err != nil {
+		log.Println(err.Error())
+		return "", "", errors.New("Internal error")
+	}
 
 	sc := bufio.NewScanner(out.Body)
 	for sc.Scan() {
@@ -154,7 +164,10 @@ func DeleteContainer(container string) error {
 	ctx := context.Background()
 
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-	FailOnError(err, "Failed to connect to docker daemon")
+	if err != nil {
+		log.Println(err.Error())
+		return errors.New("Internal error")
+	}
 
 	err = cli.ContainerRemove(ctx, container, types.ContainerRemoveOptions{Force: true})
 	return err
