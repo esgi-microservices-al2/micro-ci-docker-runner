@@ -7,10 +7,11 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/streadway/amqp"
 )
 
 // HandleMessage ... Handles a message from the commands microservice
-func HandleMessage(message CommandMessage, folderTar string, folderProjects string) {
+func HandleMessage(message CommandMessage, folderTar string, folderProjects string, eventChannel *amqp.Channel, eventQueue string) {
 	randomID, err := uuid.NewRandom()
 	if err != nil {
 		log.Printf(err.Error())
@@ -21,6 +22,8 @@ func HandleMessage(message CommandMessage, folderTar string, folderProjects stri
 	var projectPath = fmt.Sprintf("%s/%s", folderProjects, message.Folder)
 	var archivePath = destPath + "/archive.tar"
 	var context = "Dockerfile"
+
+	defer deleteWorkspaceHandler(destPath)
 
 	err = os.Mkdir(destPath, 644)
 	if err != nil {
@@ -34,28 +37,28 @@ func HandleMessage(message CommandMessage, folderTar string, folderProjects stri
 		return
 	}
 
-	imageID, err := buildImageHandler(archivePath, context, randomID.String(), randomID.String())
+	imageID, err := buildImageHandler(archivePath, context, randomID.String(), randomID.String(), eventChannel, eventQueue)
 	if err != nil {
 		log.Println(err.Error())
 		return
 	}
 
-	containerID, err := createContainerHandler(imageID, "test", randomID.String(), randomID.String())
-	defer DeleteContainer(containerID)
+	containerID, err := createContainerHandler(imageID, "test", randomID.String(), randomID.String(), eventChannel, eventQueue)
+	defer deleteContainerHandler(containerID)
 
 	if err != nil {
 		return
 	}
 
 	for _, cmd := range message.Commands {
-		err = execCommandHandler(cmd, containerID, randomID.String(), randomID.String())
+		err = execCommandHandler(cmd, containerID, randomID.String(), randomID.String(), eventChannel, eventQueue)
 		if err != nil {
 			return
 		}
 	}
 }
 
-func execCommandHandler(command []string, containerID string, buildID string, projectID string) error {
+func execCommandHandler(command []string, containerID string, buildID string, projectID string, ch *amqp.Channel, q string) error {
 	var message EventMessage = EventMessage{
 		Subject:   "Command",
 		BuildID:   buildID,
@@ -68,7 +71,7 @@ func execCommandHandler(command []string, containerID string, buildID string, pr
 		message.Content = err.Error()
 		message.Type = "error"
 
-		SendEventMessage(message)
+		SendEventMessage(message, ch, q)
 		return err
 	}
 
@@ -80,17 +83,17 @@ func execCommandHandler(command []string, containerID string, buildID string, pr
 
 	if exitCode != 0 {
 		message.Type = "error"
-		SendEventMessage(message)
+		SendEventMessage(message, ch, q)
 		return err
 	}
 
 	message.Type = "success"
-	SendEventMessage(message)
+	SendEventMessage(message, ch, q)
 
 	return nil
 }
 
-func createContainerHandler(imageID string, name string, buildID string, projectID string) (string, error) {
+func createContainerHandler(imageID string, name string, buildID string, projectID string, ch *amqp.Channel, q string) (string, error) {
 	var message EventMessage = EventMessage{
 		Subject:   "Build",
 		BuildID:   buildID,
@@ -103,7 +106,7 @@ func createContainerHandler(imageID string, name string, buildID string, project
 		message.Content = err.Error()
 		message.Type = "error"
 
-		SendEventMessage(message)
+		SendEventMessage(message, ch, q)
 		return "", err
 	}
 
@@ -111,11 +114,11 @@ func createContainerHandler(imageID string, name string, buildID string, project
 	message.Content = "Container created successfully."
 	message.Type = "info"
 
-	SendEventMessage(message)
+	SendEventMessage(message, ch, q)
 	return containerID, nil
 }
 
-func buildImageHandler(archivePath string, context string, buildID string, projectID string) (string, error) {
+func buildImageHandler(archivePath string, context string, buildID string, projectID string, ch *amqp.Channel, q string) (string, error) {
 	var message EventMessage = EventMessage{
 		Subject:   "Build",
 		BuildID:   buildID,
@@ -128,7 +131,7 @@ func buildImageHandler(archivePath string, context string, buildID string, proje
 		message.Content = err.Error()
 		message.Type = "error"
 
-		SendEventMessage(message)
+		SendEventMessage(message, ch, q)
 		return "", err
 	}
 
@@ -136,6 +139,20 @@ func buildImageHandler(archivePath string, context string, buildID string, proje
 	message.Content = stdout
 	message.Type = "info"
 
-	SendEventMessage(message)
+	SendEventMessage(message, ch, q)
 	return imageID, nil
+}
+
+func deleteWorkspaceHandler(path string) {
+	err := os.RemoveAll(path)
+	if err != nil {
+		log.Println(err.Error())
+	}
+}
+
+func deleteContainerHandler(containerID string) {
+	err := DeleteContainer(containerID)
+	if err != nil {
+		log.Println(err.Error())
+	}
 }
