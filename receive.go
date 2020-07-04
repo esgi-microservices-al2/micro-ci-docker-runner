@@ -19,6 +19,14 @@ func main() {
 	eventQueueName := Getenv("RABBIT_EVENT_QUEUE", "events")
 	folderTar := Getenv("FOLDER_TAR", ".")
 	folderProjects := Getenv("FOLDER_PROJECTS", ".")
+	consulUri := Getenv("CONSUL_URI", "localhost:8300")
+	consulToken := Getenv("CONSUL_TOKEN", "token")
+
+	consulClient, err := NewConsulClient(consulUri, consulToken)
+	FailOnError(err, "Failed to connect to consul")
+	err = consulClient.Register()
+	FailOnError(err, "Failed to register service into consul")
+	log.Printf("Registered on Consul successfully")
 
 	connectionString := fmt.Sprintf("amqp://%s:%s@%s:%s/", user, url.QueryEscape(password), host, port)
 

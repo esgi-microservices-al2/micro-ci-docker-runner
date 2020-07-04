@@ -22,9 +22,12 @@ services:
       FOLDER_TAR: ${FOLDER_TAR:-.}
       FOLDER_PROJECTS: ${FOLDER_PROJECTS:-.}
       RABBIT_EVENT_QUEUE: ${RABBIT_EVENT_QUEUE:-events}
+      CONSUL_URI: ${CONSUL_URI:-localhost:8300}
+      CONSUL_TOKEN: ${CONSUL_TOKEN:-token}
     restart: always
     privileged: true
     volumes:
+      - //var/run/docker.sock:/var/run/docker.sock
       - al2projects:/var/projects
     depends_on:
       - rabbitmq
