@@ -108,8 +108,6 @@ func RemoveEncyptionFromID(id string) string {
 
 // SendEventMessage ... Sends a message to the rabbitMQ event queue
 func SendEventMessage(eventMessage EventMessage, channel *amqp.Channel, queue string) {
-	log.Printf("%+v\n", eventMessage)
-
 	body, err := json.Marshal(eventMessage)
 	if err != nil {
 		log.Printf(err.Error())
