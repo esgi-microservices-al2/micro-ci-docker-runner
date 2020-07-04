@@ -48,6 +48,9 @@ jobs:
           export RABBIT_PASSWORD='${{ secrets.RABBIT_PASSWORD }}' && \
           export RABBIT_PORT='${{ secrets.RABBIT_PORT }}' && \
           export RABBIT_RUNNER_QUEUE='${{ secrets.RABBIT_RUNNER_QUEUE }}' && \
+          export RABBIT_EVENT_QUEUE='${{ secrets.RABBIT_EVENT_QUEUE }}' && \
+          export FOLDER_PROJECTS='${{ secrets.FOLDER_PROJECTS }}' && \
+          export FOLDER_TAR='${{ secrets.FOLDER_TAR }}' && \
           docker-compose stop && \
           docker-compose rm && \
           docker-compose pull && \
