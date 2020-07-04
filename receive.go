@@ -36,7 +36,7 @@ func main() {
 
 	q, err := channel.QueueDeclare(
 		queueName, // name
-		false,     // durable
+		true,      // durable
 		false,     // delete when unused
 		false,     // exclusive
 		false,     // no-wait

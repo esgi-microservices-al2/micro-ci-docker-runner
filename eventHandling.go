@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/streadway/amqp"
@@ -74,6 +75,7 @@ func execCommandHandler(command []string, containerID string, projectID string, 
 
 	message.Date = (time.Now()).Unix()
 	message.Content = CommandResult{
+		Command:  strings.Join(command, " "),
 		ExitCode: exitCode,
 		Stdout:   stdout,
 	}

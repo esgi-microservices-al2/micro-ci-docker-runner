@@ -38,6 +38,7 @@ type EventMessage struct {
 }
 
 type CommandResult struct {
+	Command  string `json:"command"`
 	ExitCode int    `json:"exitCode"`
 	Stdout   string `json:"stdout"`
 }
