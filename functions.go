@@ -3,11 +3,14 @@ package main
 import (
 	"archive/tar"
 	"bytes"
+	"encoding/json"
 	"io"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/streadway/amqp"
 )
 
 // Getenv ... Retrives an environment variable but provides a default fallback value if empty
@@ -33,6 +36,8 @@ func CreateTar(src string, dest string) error {
 	compress(src, &buffer)
 
 	fileToWrite, err := os.OpenFile(dest, os.O_CREATE|os.O_RDWR, os.FileMode(600))
+	defer fileToWrite.Close()
+
 	if err != nil {
 		return err
 	}
@@ -49,6 +54,8 @@ func CreateTar(src string, dest string) error {
 func compress(src string, buf io.Writer) error {
 	tw := tar.NewWriter(buf)
 	sourcePath := filepath.ToSlash(src)
+
+	defer tw.Close()
 
 	filepath.Walk(src, func(file string, fi os.FileInfo, err error) error {
 		header, err := tar.FileInfoHeader(fi, file)
@@ -100,6 +107,26 @@ func RemoveEncyptionFromID(id string) string {
 }
 
 // SendEventMessage ... Sends a message to the rabbitMQ event queue
-func SendEventMessage(eventMessage EventMessage) {
+func SendEventMessage(eventMessage EventMessage, channel *amqp.Channel, queue string) {
 	log.Printf("%+v\n", eventMessage)
+
+	body, err := json.Marshal(eventMessage)
+	if err != nil {
+		log.Printf(err.Error())
+		return
+	}
+
+	err = channel.Publish(
+		"",    // exchange
+		queue, // routing key
+		false, // mandatory
+		false, // immediate
+		amqp.Publishing{
+			ContentType: "application/json",
+			Body:        body,
+		})
+
+	if err != nil {
+		log.Printf(err.Error())
+	}
 }
