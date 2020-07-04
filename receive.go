@@ -16,6 +16,7 @@ func main() {
 	password := Getenv("RABBIT_PASSWORD", "docker")
 	port := Getenv("RABBIT_PORT", "5672")
 	queueName := Getenv("RABBIT_RUNNER_QUEUE", "commands")
+	eventQueueName := Getenv("RABBIT_EVENT_QUEUE", "events")
 	folderTar := Getenv("FOLDER_TAR", ".")
 	folderProjects := Getenv("FOLDER_PROJECTS", ".")
 
@@ -28,6 +29,10 @@ func main() {
 	channel, err := conn.Channel()
 	FailOnError(err, "Failed to open a channel")
 	defer channel.Close()
+
+	eventChannel, err := conn.Channel()
+	FailOnError(err, "Failed to open a second channel")
+	defer eventChannel.Close()
 
 	q, err := channel.QueueDeclare(
 		queueName, // name
@@ -57,7 +62,7 @@ func main() {
 			json.Unmarshal([]byte(d.Body), &msg)
 
 			d.Ack(false)
-			HandleMessage(msg, folderTar, folderProjects)
+			HandleMessage(msg, folderTar, folderProjects, eventChannel, eventQueueName)
 		}
 	}()
 
