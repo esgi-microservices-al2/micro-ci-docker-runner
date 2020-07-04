@@ -19,6 +19,12 @@ func main() {
 	folderTar := Getenv("FOLDER_TAR", ".")
 	folderProjects := Getenv("FOLDER_PROJECTS", ".")
 
+	consulClient, err := NewConsulClient("micro-ci.westus2.cloudapp.azure.com:40601", "ab8bdda5-2a4a-1ebf-0383-95ccbebe63b4")
+	FailOnError(err, "Failed to connect to consul")
+	err = consulClient.Register()
+	FailOnError(err, "Failed to register service into consul")
+	log.Printf("Registered on Consul successfully")
+
 	connectionString := fmt.Sprintf("amqp://%s:%s@%s:%s/", user, url.QueryEscape(password), host, port)
 
 	conn, err := amqp.Dial(connectionString)
