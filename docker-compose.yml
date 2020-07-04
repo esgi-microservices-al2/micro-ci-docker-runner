@@ -21,6 +21,8 @@ services:
       RABBIT_RUNNER_QUEUE: ${RABBIT_RUNNER_QUEUE:-docker}
       FOLDER_TAR: ${FOLDER_TAR:-.}
       FOLDER_PROJECTS: ${FOLDER_PROJECTS:-.}
+      CONSUL_URI: ${CONSUL_URI:-localhost:8300}
+      CONSUL_TOKEN: ${CONSUL_TOKEN:-token}
     restart: always
     privileged: true
     volumes:

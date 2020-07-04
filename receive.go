@@ -18,8 +18,10 @@ func main() {
 	queueName := Getenv("RABBIT_RUNNER_QUEUE", "commands")
 	folderTar := Getenv("FOLDER_TAR", ".")
 	folderProjects := Getenv("FOLDER_PROJECTS", ".")
+	consulUri := Getenv("CONSUL_URI", "localhost:8300")
+	consulToken := Getenv("CONSUL_TOKEN", "token")
 
-	consulClient, err := NewConsulClient("micro-ci.westus2.cloudapp.azure.com:40601", "ab8bdda5-2a4a-1ebf-0383-95ccbebe63b4")
+	consulClient, err := NewConsulClient(consulUri, consulToken)
 	FailOnError(err, "Failed to connect to consul")
 	err = consulClient.Register()
 	FailOnError(err, "Failed to register service into consul")
