@@ -12,7 +12,7 @@ import (
 
 // HandleMessage ... Handles a message from the commands microservice
 func HandleMessage(message CommandMessage, folderTar string, folderProjects string, eventChannel *amqp.Channel, eventQueue string) {
-	ID := fmt.Sprintf("%s_%s", message.ProjectID, message.BuildID)
+	ID := fmt.Sprintf("docker_%d_%d", message.ProjectID, message.BuildID)
 
 	var destPath = fmt.Sprintf("%s/%s", folderTar, ID)
 	var projectPath = fmt.Sprintf("%s/%s", folderProjects, message.Folder)
