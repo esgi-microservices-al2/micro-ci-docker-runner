@@ -30,8 +30,8 @@ type DockerError struct {
 
 type EventMessage struct {
 	Subject   string      `json:"subject"`
-	ProjectID string      `json:"projectId"`
-	BuildID   string      `json:"buildId"`
+	ProjectID int         `json:"projectId"`
+	BuildID   int         `json:"buildId"`
 	Date      int64       `json:"date"`
 	Content   interface{} `json:"content"`
 	Type      string      `json:"type"`
