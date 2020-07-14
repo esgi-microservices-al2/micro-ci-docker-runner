@@ -1,8 +1,8 @@
 package main
 
 type CommandMessage struct {
-	BuildID   string     `json:"buildId"`
-	ProjectID string     `json:"projectId"`
+	BuildID   int        `json:"buildId"`
+	ProjectID int        `json:"projectId"`
 	Folder    string     `json:"folder"`
 	Commands  [][]string `json:"commands"`
 }
