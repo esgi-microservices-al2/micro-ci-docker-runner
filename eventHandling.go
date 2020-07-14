@@ -58,7 +58,7 @@ func HandleMessage(message CommandMessage, folderTar string, folderProjects stri
 	successfullBuild(message.ProjectID, message.BuildID, eventChannel, eventQueue)
 }
 
-func execCommandHandler(command []string, containerID string, projectID string, buildID string, ch *amqp.Channel, q string) error {
+func execCommandHandler(command []string, containerID string, projectID int, buildID int, ch *amqp.Channel, q string) error {
 	var message EventMessage = EventMessage{
 		Subject:   "Command",
 		BuildID:   buildID,
@@ -94,7 +94,7 @@ func execCommandHandler(command []string, containerID string, projectID string, 
 	return nil
 }
 
-func createContainerHandler(imageID string, name string, projectID string, buildID string, ch *amqp.Channel, q string) (string, error) {
+func createContainerHandler(imageID string, name string, projectID int, buildID int, ch *amqp.Channel, q string) (string, error) {
 	var message EventMessage = EventMessage{
 		Subject:   "Build",
 		BuildID:   buildID,
@@ -119,7 +119,7 @@ func createContainerHandler(imageID string, name string, projectID string, build
 	return containerID, nil
 }
 
-func buildImageHandler(archivePath string, context string, projectID string, buildID string, ch *amqp.Channel, q string) (string, error) {
+func buildImageHandler(archivePath string, context string, projectID int, buildID int, ch *amqp.Channel, q string) (string, error) {
 	var message EventMessage = EventMessage{
 		Subject:   "Build",
 		BuildID:   buildID,
@@ -144,7 +144,7 @@ func buildImageHandler(archivePath string, context string, projectID string, bui
 	return imageID, nil
 }
 
-func tarCreationHandler(projectPath string, archivePath string, projectID string, buildID string, ch *amqp.Channel, q string) error {
+func tarCreationHandler(projectPath string, archivePath string, projectID int, buildID int, ch *amqp.Channel, q string) error {
 	var message EventMessage = EventMessage{
 		Subject:   "Build",
 		BuildID:   buildID,
@@ -164,7 +164,7 @@ func tarCreationHandler(projectPath string, archivePath string, projectID string
 	return nil
 }
 
-func successfullBuild(projectID string, buildID string, ch *amqp.Channel, q string) {
+func successfullBuild(projectID int, buildID int, ch *amqp.Channel, q string) {
 	var message EventMessage = EventMessage{
 		Subject:   "Build",
 		BuildID:   buildID,
